@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Calendar from 'rc-year-calendar';
 import Modal from './assets/Modal';
 import MyCalendar from './components/MyCalendar';
-
 const App = () => {
   // I have changed a line
   const [showModal, setShowModal] = useState<boolean>(false);
