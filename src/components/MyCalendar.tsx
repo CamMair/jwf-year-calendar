@@ -18,7 +18,7 @@ const MyCalendar = () => {
   ];
 
   return (
-    <div className="grid grid-cols-4 justify-items-center">
+    <div className="grid grid-cols-4 justify-items-center select-none">
       {months.map((month, index) => {
         return <Month className="h-50 w-44" index={index} title={month} year={year} />;
       })}
