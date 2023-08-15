@@ -1,13 +1,13 @@
 const Day = (props: { className?: string; contents: string }) => {
-  return <div className={`${props.className || ''} col-1 inline-block h-6 w-6`}>{props.contents}</div>;
+  return <div className={`${props.className || ''} col-1 inline-block h-6 w-6 text-sm`}>{props.contents}</div>;
 };
 
 const DayNumbered = (props: { number: number }) => {
-  return <Day contents={props.number.toString()} />;
+  return <Day className="text-xs cursor-pointer hover:bg-gray-300 rounded-md justify-items-center pt-1 pb-1 pl-1.5 pr-1.5" contents={props.number.toString() } />;
 };
 
 const DayOfWeekHeading = (props: { name: string }) => {
-  return <Day className="font-bold" contents={props.name} />;
+  return <Day className="font-bold text-sm" contents={props.name} />;
 };
 
 const DayPlaceholder = () => {
@@ -23,7 +23,7 @@ const Month = (props: { className?: string; index: number; title: string; year: 
   return (
     <div className={`${props.className} ${monthClasses}`}>
       <div className="font-bold">{props.title}</div>
-      <div className="grid grid-cols-7 ">
+      <div className="grid grid-cols-7 mt-1">
         {dayNames.map(name => {
           return <DayOfWeekHeading name={name} />;
         })}
