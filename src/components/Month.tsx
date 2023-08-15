@@ -27,7 +27,7 @@ const Month = (props: { className?: string; index: number; title: string; year: 
         {dayNames.map(name => {
           return <DayOfWeekHeading name={name} />;
         })}
-        {Array.from({ length: startDayOfMonth }).map((_, i) => {
+        {Array.from({ length: startDayOfMonth }).map(() => {
           return <DayPlaceholder />;
         })}
         {Array.from({ length: daysInMonth }).map((_, i) => {
