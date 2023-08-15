@@ -1,9 +1,30 @@
-const Day = (props: { className?: string; contents: string }) => {
-  return <div className={`${props.className || ''} col-1 h-6 inline-block text-sm w-6`}>{props.contents}</div>;
+import { MouseEventHandler } from 'react';
+
+const Day = (props: {
+  className?: string;
+  contents: string;
+  onContextMenu?: MouseEventHandler<HTMLDivElement> | undefined;
+}) => {
+  return (
+    <div
+      className={`${props.className || ''} col-1 h-6 inline-block text-sm w-6`}
+      onContextMenu={e => (props.onContextMenu ? props.onContextMenu(e) : null)}
+    >
+      {props.contents}
+    </div>
+  );
 };
 
 const DayNumbered = (props: { number: number }) => {
-  return <Day className="cursor-pointer hover:bg-gray-300 justify-items-center rounded-md py-1 px-1.5 select-none text-xs " contents={props.number.toString() } />;
+  return (
+    <Day
+      className="cursor-pointer hover:bg-gray-300 justify-items-center rounded-md py-1 select-none text-center text-xs"
+      contents={props.number.toString()}
+      onContextMenu={e => {
+        e.preventDefault();
+      }}
+    />
+  );
 };
 
 const DayOfWeekHeading = (props: { name: string }) => {
