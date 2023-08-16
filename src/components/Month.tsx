@@ -39,7 +39,8 @@ const Month = (props: { className?: string; index: number; title: string; year: 
   const daysInMonth = new Date(props.year, props.index + 1, 0).getDate();
   const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
   const startDayOfMonth = new Date(props.year, props.index, 1).getDay();
-  const monthClasses = 'bg-white-500 flex flex-col items-center text-black text-center';
+  const monthClasses =
+    'mx-11 bg-white-500 h-50 inline-block items-center justify-items-center text-black text-center w-44';
 
   return (
     <div className={`${props.className} ${monthClasses}`}>

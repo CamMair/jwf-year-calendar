@@ -1,7 +1,11 @@
+import React, { useState, useEffect, useRef } from 'react';
 import Month from './Month';
 
 const MyCalendar = () => {
-  const year = 2020;
+  const myCalendarRef = useRef<HTMLDivElement | null>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const year = 2023;
   const months = [
     'January',
     'February',
@@ -17,12 +21,58 @@ const MyCalendar = () => {
     'December',
   ];
 
+  useEffect(() => {
+    let newWidth = 0;
+    if (myCalendarRef?.current) {
+      newWidth = myCalendarRef.current.clientWidth;
+    }
+    setContainerWidth(newWidth);
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  const determineGridCols = () => {
+    const minWidth = Math.min(windowWidth, containerWidth);
+    console.log('current width: ', minWidth);
+    if (minWidth >= 1100) {
+      return 'grid-cols-6';
+    }
+    if (minWidth >= 756) {
+      return 'grid-cols-4';
+    }
+    if (minWidth >= 572) {
+      return 'grid-cols-3';
+    }
+    if (minWidth >= 386) {
+      return 'grid-cols-2';
+    }
+    if (minWidth >= 1) {
+      return 'grid-cols-1';
+    }
+    return 'grid-cols-6';
+  };
+
   return (
-    <div className="grid grid-cols-4 justify-items-center select-none">
-      {months.map((month, index) => {
-        return <Month className="h-50 w-44" index={index} title={month} year={year} />;
-      })}
-    </div>
+    <>
+      {/* <div className="container max-w-8xl bg-sky-100"> */}
+      <div
+        className={`grid ${determineGridCols()} justify-items-center select-none text-center w-full`}
+        ref={myCalendarRef}
+      >
+        {months.map((month, index) => {
+          return <Month index={index} title={month} year={year} />;
+        })}
+      </div>
+      {/* </div> */}
+    </>
   );
 };
 
