@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Month from './Month';
 
 const MyCalendar = () => {
@@ -27,7 +27,7 @@ const MyCalendar = () => {
       newWidth = myCalendarRef.current.clientWidth;
     }
     setContainerWidth(newWidth);
-  }, []);
+  }, [myCalendarRef.current?.clientWidth]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -37,11 +37,10 @@ const MyCalendar = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [window.innerWidth]);
 
   const determineGridCols = () => {
     const minWidth = Math.min(windowWidth, containerWidth);
-    console.log('current width: ', minWidth);
     if (minWidth >= 1100) {
       return 'grid-cols-6';
     }
@@ -54,10 +53,7 @@ const MyCalendar = () => {
     if (minWidth >= 386) {
       return 'grid-cols-2';
     }
-    if (minWidth >= 1) {
-      return 'grid-cols-1';
-    }
-    return 'grid-cols-6';
+    return 'grid-cols-1';
   };
 
   return (
@@ -68,7 +64,7 @@ const MyCalendar = () => {
         ref={myCalendarRef}
       >
         {months.map((month, index) => {
-          return <Month index={index} title={month} year={year} />;
+          return <Month index={index} key={index} title={month} year={year} />;
         })}
       </div>
       {/* </div> */}

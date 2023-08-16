@@ -46,14 +46,14 @@ const Month = (props: { className?: string; index: number; title: string; year: 
     <div className={`${props.className} ${monthClasses}`}>
       <div className="cursor-default font-bold select-none">{props.title}</div>
       <div className="grid grid-cols-7 mt-1">
-        {dayNames.map(name => {
-          return <DayOfWeekHeading name={name} />;
+        {dayNames.map((name, i) => {
+          return <DayOfWeekHeading key={i} name={name} />;
         })}
-        {Array.from({ length: startDayOfMonth }).map(() => {
-          return <DayPlaceholder />;
+        {Array.from({ length: startDayOfMonth }).map((_, i) => {
+          return <DayPlaceholder key={i} />;
         })}
         {Array.from({ length: daysInMonth }).map((_, i) => {
-          return <DayNumbered number={i + 1} />;
+          return <DayNumbered key={i} number={i + 1} />;
         })}
       </div>
     </div>
