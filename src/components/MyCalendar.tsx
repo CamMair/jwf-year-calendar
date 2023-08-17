@@ -78,7 +78,6 @@ const MyCalendar = (props: { year?: number; className?: string }) => {
 
   const determineGridCols = () => {
     const minWidth = Math.min(windowWidth, containerWidth);
-    console.log('current width: ', minWidth);
     if (minWidth >= 1100) {
       return 'grid-cols-6';
     }
@@ -97,37 +96,30 @@ const MyCalendar = (props: { year?: number; className?: string }) => {
     return 'grid-cols-6';
   };
 
-  const yearBP1 = () => {
-    const minWidth = Math.min(windowWidth, containerWidth);
-    if (minWidth <= 975) {
-      return 'hidden';
-    }
-    return '';
+  const showYearEnd = () => {
+    return Math.min(windowWidth, containerWidth) > 975;
   };
 
-  const yearBP2 = () => {
-    const minWidth = Math.min(windowWidth, containerWidth);
-    if (minWidth <= 750) {
-      return 'hidden';
-    }
-    return '';
+  const showYearMiddle = () => {
+    return Math.min(windowWidth, containerWidth) > 750;
   };
+
   return (
     <>
       {/* <div className="container max-w-8xl bg-sky-100"> */}
       <div className="border border-1">
-        <div className={`${yearBP1} flex items-center justify-center`}>
+        <div className={`flex items-center justify-center`}>
           <button
             className={'bg-white font-bold h-11 hover:bg-gray-200 px-2.5 text-gray-800 text-2xl w-7'}
             onClick={() => setYear(year - 1)}
           >
             {'‹'}
           </button>
-          <YearEnd className={yearBP2()} onClick={y => setYear(y)} year={year - 2} />
-          <YearMiddle className={yearBP1()} onClick={y => setYear(y)} year={year - 1} />
+          {showYearEnd() && <YearEnd onClick={y => setYear(y)} year={year - 2} />}
+          {showYearMiddle() && <YearMiddle onClick={y => setYear(y)} year={year - 1} />}
           <YearCentre onClick={y => setYear(y)} year={year} />
-          <YearMiddle className={yearBP1()} onClick={y => setYear(y)} year={year + 1} />
-          <YearEnd className={yearBP2()} onClick={y => setYear(y)} year={year + 2} />
+          {showYearMiddle() && <YearMiddle onClick={y => setYear(y)} year={year + 1} />}
+          {showYearEnd() && <YearEnd onClick={y => setYear(y)} year={year + 2} />}
           <button
             className={'bg-white font-bold h-11 hover:bg-gray-200 px-2.5 text-gray-800 text-2xl w-7'}
             onClick={() => setYear(year + 1)}
