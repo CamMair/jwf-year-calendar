@@ -38,6 +38,9 @@ const DayPlaceholder = () => {
 const Month = (props: { className?: string; index: number; title: string; year: number }) => {
   const daysInMonth = new Date(props.year, props.index + 1, 0).getDate();
   const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  const firstDayOfMonth = new Date(props.year, props.index, 1);
+  const startDay = firstDayOfMonth.getDate();
+  const changeDay = startDay === 0 ? 6 : startDay - 1;
   const startDayOfMonth = new Date(props.year, props.index, 1).getDay();
   const monthClasses =
     'mx-11 bg-white-500 h-50 inline-block items-center justify-items-center text-black text-center w-44';
@@ -54,6 +57,9 @@ const Month = (props: { className?: string; index: number; title: string; year: 
         })}
         {Array.from({ length: daysInMonth }).map((_, i) => {
           return <DayNumbered key={i} number={i + 1} />;
+        })}
+        {Array.from({ length: changeDay }).map((_, i) => {
+          return <div key={`${i + 1}`} className={'empty-day'} />;
         })}
       </div>
     </div>
