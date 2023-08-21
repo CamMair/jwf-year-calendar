@@ -39,7 +39,9 @@ function App() {
           <div>{end?.toISOString()}</div>
         </Modal>
       )}
-      <MyCalendar enableRangeSelection={true} onRangeSelected={e => console.log(e)} />
+      
+      <MyCalendar enableRangeSelection={true} onRangeSelected={e => console.log(e)} weekStart={0} />
+      
       <Calendar
         contextMenuItems={[
           { text: 'Delete', click: () => console.log(1) },
@@ -51,6 +53,8 @@ function App() {
         enableContextMenu={true}
         enableRangeSelection={false}
         onRangeSelected={(e: { startDate: Date; endDate: Date }) => handleRangeSelected(e.startDate, e.endDate)}
+        onYearChanged={(e: { currentYear: number }) => console.log(e.currentYear)}
+        year={2038}
       />
     </React.StrictMode>
   );
