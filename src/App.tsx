@@ -39,7 +39,7 @@ const App = () => {
           <div>{end?.toISOString()}</div>
         </Modal>
       )}
-      <MyCalendar />
+      <MyCalendar weekStart={0} />
       <Calendar
         contextMenuItems={[
           { text: 'Delete', click: () => console.log(1) },

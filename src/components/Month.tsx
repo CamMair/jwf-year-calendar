@@ -1,5 +1,7 @@
 import { MouseEventHandler } from 'react';
 
+export type WeekStartType = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
 const Day = (props: {
   className?: string;
   contents: string;
@@ -35,9 +37,18 @@ const DayPlaceholder = () => {
   return <Day contents=" " />;
 };
 
-const Month = (props: { className?: string; index: number; title: string; year: number }) => {
+const Month = (props: {
+  className?: string;
+  index: number;
+  title: string;
+  weekStart?: WeekStartType;
+  year: number;
+}) => {
   const daysInMonth = new Date(props.year, props.index + 1, 0).getDate();
-  const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  let dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  if (props.weekStart) {
+    dayNames = [...dayNames.slice(props.weekStart), ...dayNames.slice(0, props.weekStart)];
+  }
   const startDayOfMonth = new Date(props.year, props.index, 1).getDay();
   const monthClasses =
     'mx-11 bg-white-500 h-50 inline-block items-center justify-items-center text-black text-center w-44';
@@ -49,7 +60,7 @@ const Month = (props: { className?: string; index: number; title: string; year: 
         {dayNames.map((name, i) => {
           return <DayOfWeekHeading key={i} name={name} />;
         })}
-        {Array.from({ length: startDayOfMonth }).map((_, i) => {
+        {Array.from({ length: (startDayOfMonth - (props.weekStart || 0) + 7) % 7 }).map((_, i) => {
           return <DayPlaceholder key={i} />;
         })}
         {Array.from({ length: daysInMonth }).map((_, i) => {
