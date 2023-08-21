@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Month from './Month';
+import Month, { WeekStartType } from './Month';
 
 const Year = (props: { className?: string; onClick?: (year: number) => unknown; year: number }) => {
   return (
@@ -38,7 +38,7 @@ const YearEnd = (props: { className?: string; onClick?: (year: number) => unknow
   );
 };
 
-const MyCalendar = (props: { year?: number; className?: string }) => {
+const MyCalendar = (props: { className?: string; weekStart?: WeekStartType; year?: number; }) => {
   const myCalendarRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -133,7 +133,7 @@ const MyCalendar = (props: { year?: number; className?: string }) => {
         ref={myCalendarRef}
       >
         {months.map((month, index) => {
-          return <Month index={index} title={month} year={year} />;
+          return <Month index={index} key={index} title={month} weekStart={props.weekStart} year={year} />;
         })}
       </div>
       {/* </div> */}
