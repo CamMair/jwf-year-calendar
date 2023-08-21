@@ -1,12 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Month from './Month';
+import { CalendarDate, isAfter, isBefore } from '../lib/dates';
 
-const MyCalendar = () => {
+const MyCalendar = (props: {
+  enableRangeSelection?: boolean;
+  onRangeSelected?: (e: { startDate: CalendarDate; endDate: CalendarDate }) => void;
+}) => {
   const myCalendarRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [startDate, setStartDate] = useState<{ day: number; month: number; year: number } | null>(null);
   const [endDate, setEndDate] = useState<{ day: number; month: number; year: number } | null>(null);
+
+  const handleSetEndDate = (d: CalendarDate | null) => {
+    if (props.enableRangeSelection) {
+      setEndDate(d);
+    }
+  };
+
+  const handleSetStartDate = (d: CalendarDate | null) => {
+    if (props.enableRangeSelection) {
+      setStartDate(d);
+    }
+  };
 
   const year = 2023;
   const months = [
@@ -58,16 +74,32 @@ const MyCalendar = () => {
     }
     return 'grid-cols-1';
   };
-  console.log(startDate, endDate);
+
+  const orderDates = (one: CalendarDate, two: CalendarDate) => {
+    if (isBefore(one, two)) {
+      return { startDate: one, endDate: two };
+    }
+    if (isAfter(one, two)) {
+      return { startDate: two, endDate: one };
+    }
+    throw new Error('orderDates method in MyCalendar failed');
+  };
+
   return (
     <>
       {/* <div className="container max-w-8xl bg-sky-100"> */}
       <div
         className={`grid ${determineGridCols()} justify-items-center select-none text-center w-full`}
         ref={myCalendarRef}
-        onMouseDown={() => setEndDate(null)}
-        onMouseUp={() => setStartDate(null)}
-        onMouseLeave={() => setStartDate(null)}
+        onMouseDown={() => handleSetEndDate(null)}
+        onMouseUp={() => {
+          if (startDate && endDate && props.onRangeSelected) {
+            props.onRangeSelected(orderDates(startDate, endDate));
+          }
+          handleSetStartDate(null);
+          return false;
+        }}
+        onMouseLeave={() => handleSetStartDate(null)}
       >
         {months.map((month, index) => {
           return (
@@ -75,8 +107,8 @@ const MyCalendar = () => {
               endDate={endDate}
               index={index}
               key={index}
-              setEndDate={setEndDate}
-              setStartDate={setStartDate}
+              setEndDate={handleSetEndDate}
+              setStartDate={handleSetStartDate}
               startDate={startDate}
               title={month}
               year={year}

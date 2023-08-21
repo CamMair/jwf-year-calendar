@@ -5,7 +5,7 @@ import Calendar from 'rc-year-calendar';
 import Modal from './assets/Modal';
 import MyCalendar from './components/MyCalendar';
 
-const App = () => {
+function App() {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [start, setStart] = useState<Date | null>(null);
   const [end, setEnd] = useState<Date | null>(null);
@@ -39,7 +39,7 @@ const App = () => {
           <div>{end?.toISOString()}</div>
         </Modal>
       )}
-      <MyCalendar />
+      <MyCalendar enableRangeSelection={true} onRangeSelected={e => console.log(e)} />
       <Calendar
         contextMenuItems={[
           { text: 'Delete', click: () => console.log(1) },
@@ -49,11 +49,11 @@ const App = () => {
         ]}
         dataSource={dataSource}
         enableContextMenu={true}
-        enableRangeSelection="true"
+        enableRangeSelection={false}
         onRangeSelected={(e: { startDate: Date; endDate: Date }) => handleRangeSelected(e.startDate, e.endDate)}
       />
     </React.StrictMode>
   );
-};
+}
 
 export default App;

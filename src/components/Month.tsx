@@ -1,18 +1,18 @@
 import { MouseEventHandler } from 'react';
-
-type CalendarDate = { day: number; month: number; year: number };
+import { CalendarDate, isAfter, isBefore, isEqual } from '../lib/dates';
 
 const Day = (props: {
   className?: string;
   contents: string;
   onContextMenu?: MouseEventHandler<HTMLDivElement> | undefined;
   onMouseDown?: MouseEventHandler;
+  onMouseMove?: MouseEventHandler;
   onMouseUp?: MouseEventHandler;
   onMouseEnter?: MouseEventHandler;
 }) => {
   return (
     <div
-      className={`${props.className || ''} col-1 h-6 inline-block text-sm w-6`}
+      className={`${props.className || ''} col-1 h-6 inline-block text-sm`}
       onContextMenu={e => (props.onContextMenu ? props.onContextMenu(e) : null)}
       onMouseDown={props.onMouseDown}
       onMouseUp={props.onMouseUp}
@@ -32,47 +32,37 @@ const DayNumbered = (props: {
   startDate: CalendarDate | null;
   year: number;
 }) => {
-  const isAfterStartDate = () => {
-    if (props.startDate) {
-      if (
-        (props.startDate?.month <= props.month && props.startDate.day <= props.day) ||
-        props.startDate?.month < props.month
-      ) {
-        return true;
-      }
-    }
-    return false;
+  const thisDate = {
+    day: props.day,
+    month: props.month,
+    year: props.year,
   };
 
-  const isAfterEndDate = () => {
-    if (props.endDate) {
-      if (
-        (props.endDate?.month <= props.month && props.endDate.day <= props.day) ||
-        props.endDate?.month < props.month
-      ) {
-        return true;
-      }
+  const borderClass = () => {
+    if (props.startDate && isEqual(thisDate, props.startDate) && isAfter(props.endDate, props.startDate)) {
+      return 'rounded-l';
     }
-    return false;
+    if (props.startDate && isEqual(thisDate, props.endDate) && isBefore(props.endDate, props.startDate)) {
+      return 'rounded-l';
+    }
+    if (props.startDate && isEqual(thisDate, props.endDate) && isAfter(props.endDate, props.startDate)) {
+      return 'rounded-r';
+    }
+    if (props.startDate && isEqual(thisDate, props.startDate) && isBefore(props.endDate, props.startDate)) {
+      return 'rounded-r';
+    }
+    if (props.startDate && !isEqual(thisDate, props.startDate) && !isEqual(thisDate, props.endDate)) {
+      return '';
+    }
+    return 'hover:rounded';
   };
 
-  const isBeforeEndDate = () => {
-    if (props.endDate) {
-      if (
-        (props.endDate?.month >= props.month && props.endDate.day >= props.day) ||
-        props.endDate?.month > props.month
-      ) {
+  const isBetweenDates = () => {
+    if (props.startDate && props.endDate) {
+      if (isAfter(thisDate, props.startDate) && isBefore(thisDate, props.endDate)) {
         return true;
       }
-    }
-    return false;
-  };
-  const isBeforeStartDate = () => {
-    if (props.startDate) {
-      if (
-        (props.startDate?.month >= props.month && props.startDate.day >= props.day) ||
-        props.startDate?.month > props.month
-      ) {
+      if (isAfter(thisDate, props.endDate) && isBefore(thisDate, props.startDate)) {
         return true;
       }
     }
@@ -81,18 +71,18 @@ const DayNumbered = (props: {
 
   return (
     <Day
-      className={`cursor-pointer hover:bg-gray-300 ${isAfterStartDate() ? 'bg-gray-300' : ''} ${
-        isBeforeEndDate() ? 'bg-gray-30' : ''
-      }  ${isAfterEndDate() ? '' : ''} ${
-        isBeforeStartDate() ? '' : ''
-      } justify-items-center rounded-md py-1 select-none text-center text-xs`}
+      className={`cursor-pointer hover:bg-gray-300 ${
+        isBetweenDates() ? 'bg-gray-300' : ''
+      } justify-items-center py-1 select-none text-center text-xs mx-0 ${borderClass()}`}
       contents={props.day.toString()}
       onContextMenu={e => {
         e.preventDefault();
       }}
-      onMouseDown={() => props.setStartDate({ day: props.day, month: props.month, year: props.year })}
-      onMouseUp={() => props.setEndDate({ day: props.day, month: props.month, year: props.year })}
-      onMouseEnter={() => console.log({ day: props.day, month: props.month, year: props.year })}
+      onMouseDown={() =>
+        props.setStartDate({ day: props.day, month: props.month, year: props.year }) &&
+        props.setEndDate({ day: props.day, month: props.month, year: props.year })
+      }
+      onMouseEnter={() => props.setEndDate({ day: props.day, month: props.month, year: props.year })}
     />
   );
 };
