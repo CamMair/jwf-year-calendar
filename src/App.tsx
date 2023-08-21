@@ -51,6 +51,8 @@ const App = () => {
         enableContextMenu={true}
         enableRangeSelection="true"
         onRangeSelected={(e: { startDate: Date; endDate: Date }) => handleRangeSelected(e.startDate, e.endDate)}
+        onYearChanged={(e: { currentYear: number }) => console.log(e.currentYear)}
+        year={2038}
       />
     </React.StrictMode>
   );
