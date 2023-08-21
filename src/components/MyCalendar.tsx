@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Month, { WeekStartType } from './Month';
 
+
+import Month, { WeekStartType } from './Month';
+import { CalendarDate, isAfter, isBefore } from '../lib/dates';
+    
 const Year = (props: { className?: string; onClick?: (year: number) => unknown; year: number }) => {
   return (
     <button
@@ -38,11 +41,27 @@ const YearEnd = (props: { className?: string; onClick?: (year: number) => unknow
   );
 };
 
-const MyCalendar = (props: { className?: string; weekStart?: WeekStartType; year?: number; }) => {
+const MyCalendar = (props: { className?: string; weekStart?: WeekStartType; year?: number; enableRangeSelection?: boolean;
+  onRangeSelected?: (e: { startDate: CalendarDate; endDate: CalendarDate }) => void; }) => {
   const myCalendarRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [startDate, setStartDate] = useState<{ day: number; month: number; year: number } | null>(null);
+  const [endDate, setEndDate] = useState<{ day: number; month: number; year: number } | null>(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [year, setYear] = useState(props.year || new Date().getFullYear());
+  
+  const handleSetEndDate = (d: CalendarDate | null) => {
+    if (props.enableRangeSelection) {
+      setEndDate(d);
+    }
+  };
+  
+  const handleSetStartDate = (d: CalendarDate | null) => {
+    if (props.enableRangeSelection) {
+      setStartDate(d);
+    }
+  };
+
   const months = [
     'January',
     'February',
@@ -104,6 +123,16 @@ const MyCalendar = (props: { className?: string; weekStart?: WeekStartType; year
     return Math.min(windowWidth, containerWidth) > 750;
   };
 
+  const orderDates = (one: CalendarDate, two: CalendarDate) => {
+    if (isBefore(one, two)) {
+      return { startDate: one, endDate: two };
+    }
+    if (isAfter(one, two)) {
+      return { startDate: two, endDate: one };
+    }
+    throw new Error('orderDates method in MyCalendar failed');
+  };
+
   return (
     <>
       {/* <div className="container max-w-8xl bg-sky-100"> */}
@@ -131,9 +160,32 @@ const MyCalendar = (props: { className?: string; weekStart?: WeekStartType; year
       <div
         className={`grid ${determineGridCols()} justify-items-center mt-5 select-none text-center text-sm w-full`}
         ref={myCalendarRef}
+        onMouseDown={() => handleSetEndDate(null)}
+        onMouseUp={() => {
+          if (startDate && endDate && props.onRangeSelected) {
+            props.onRangeSelected(orderDates(startDate, endDate));
+          }
+          handleSetStartDate(null);
+          return false;
+        }}
+        onMouseLeave={() => handleSetStartDate(null)}
       >
         {months.map((month, index) => {
-          return <Month index={index} key={index} title={month} weekStart={props.weekStart} year={year} />;
+
+          return (
+            <Month
+              endDate={endDate}
+              index={index}
+              key={index}
+              setEndDate={handleSetEndDate}
+              setStartDate={handleSetStartDate}
+              startDate={startDate}
+              title={month}
+              weekStart={props.weekStart}
+              year={year}
+            />
+          );
+
         })}
       </div>
       {/* </div> */}

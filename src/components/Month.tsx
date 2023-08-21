@@ -1,4 +1,5 @@
 import { MouseEventHandler } from 'react';
+import { CalendarDate, isAfter, isBefore, isEqual } from '../lib/dates';
 
 export type WeekStartType = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -6,25 +7,84 @@ const Day = (props: {
   className?: string;
   contents: string;
   onContextMenu?: MouseEventHandler<HTMLDivElement> | undefined;
+  onMouseDown?: MouseEventHandler;
+  onMouseMove?: MouseEventHandler;
+  onMouseUp?: MouseEventHandler;
+  onMouseEnter?: MouseEventHandler;
 }) => {
   return (
     <div
-      className={`${props.className || ''} col-1 h-6 inline-block text-sm w-6`}
+      className={`${props.className || ''} col-1 h-6 inline-block text-sm`}
       onContextMenu={e => (props.onContextMenu ? props.onContextMenu(e) : null)}
+      onMouseDown={props.onMouseDown}
+      onMouseUp={props.onMouseUp}
+      onMouseEnter={props.onMouseEnter}
     >
       {props.contents}
     </div>
   );
 };
 
-const DayNumbered = (props: { number: number }) => {
+const DayNumbered = (props: {
+  day: number;
+  endDate: CalendarDate | null;
+  month: number;
+  setEndDate: (x: CalendarDate | null) => unknown;
+  setStartDate: (x: CalendarDate | null) => unknown;
+  startDate: CalendarDate | null;
+  year: number;
+}) => {
+  const thisDate = {
+    day: props.day,
+    month: props.month,
+    year: props.year,
+  };
+
+  const borderClass = () => {
+    if (props.startDate && isEqual(thisDate, props.startDate) && isAfter(props.endDate, props.startDate)) {
+      return 'rounded-l';
+    }
+    if (props.startDate && isEqual(thisDate, props.endDate) && isBefore(props.endDate, props.startDate)) {
+      return 'rounded-l';
+    }
+    if (props.startDate && isEqual(thisDate, props.endDate) && isAfter(props.endDate, props.startDate)) {
+      return 'rounded-r';
+    }
+    if (props.startDate && isEqual(thisDate, props.startDate) && isBefore(props.endDate, props.startDate)) {
+      return 'rounded-r';
+    }
+    if (props.startDate && !isEqual(thisDate, props.startDate) && !isEqual(thisDate, props.endDate)) {
+      return '';
+    }
+    return 'hover:rounded';
+  };
+
+  const isBetweenDates = () => {
+    if (props.startDate && props.endDate) {
+      if (isAfter(thisDate, props.startDate) && isBefore(thisDate, props.endDate)) {
+        return true;
+      }
+      if (isAfter(thisDate, props.endDate) && isBefore(thisDate, props.startDate)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   return (
     <Day
-      className="cursor-pointer hover:bg-gray-300 justify-items-center rounded-md py-1 select-none text-center text-xs"
-      contents={props.number.toString()}
+      className={`cursor-pointer hover:bg-gray-300 ${
+        isBetweenDates() ? 'bg-gray-300' : ''
+      } justify-items-center py-1 select-none text-center text-xs mx-0 ${borderClass()}`}
+      contents={props.day.toString()}
       onContextMenu={e => {
         e.preventDefault();
       }}
+      onMouseDown={() =>
+        props.setStartDate({ day: props.day, month: props.month, year: props.year }) &&
+        props.setEndDate({ day: props.day, month: props.month, year: props.year })
+      }
+      onMouseEnter={() => props.setEndDate({ day: props.day, month: props.month, year: props.year })}
     />
   );
 };
@@ -39,10 +99,15 @@ const DayPlaceholder = () => {
 
 const Month = (props: {
   className?: string;
+  endDate: CalendarDate | null;
   index: number;
+  setEndDate: (x: CalendarDate | null) => unknown;
+  setStartDate: (x: CalendarDate | null) => unknown;
+  startDate: CalendarDate | null;
   title: string;
   weekStart?: WeekStartType;
   year: number;
+
 }) => {
   const daysInMonth = new Date(props.year, props.index + 1, 0).getDate();
   let dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
@@ -64,7 +129,18 @@ const Month = (props: {
           return <DayPlaceholder key={i} />;
         })}
         {Array.from({ length: daysInMonth }).map((_, i) => {
-          return <DayNumbered key={i} number={i + 1} />;
+          return (
+            <DayNumbered
+              day={i + 1}
+              endDate={props.endDate}
+              month={props.index + 1}
+              key={i}
+              setEndDate={props.setEndDate}
+              setStartDate={props.setStartDate}
+              startDate={props.startDate}
+              year={props.year}
+            />
+          );
         })}
       </div>
     </div>
