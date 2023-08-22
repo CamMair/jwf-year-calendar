@@ -1,11 +1,14 @@
-export type CalendarDate = { day: number; month: number; year: number };
+import { CalendarDate } from './types';
 
 export const isAfter = (test: CalendarDate | null, reference: CalendarDate | null) => {
   if (test && reference) {
-    if (test.month > reference.month) {
+    if (test.year > reference.year) {
       return true;
     }
-    if (test.day >= reference.day && test.month === reference.month) {
+    if (test.month > reference.month && test.year === reference.year) {
+      return true;
+    }
+    if (test.day >= reference.day && test.month === reference.month && test.year === reference.year) {
       return true;
     }
   }
@@ -14,10 +17,13 @@ export const isAfter = (test: CalendarDate | null, reference: CalendarDate | nul
 
 export const isBefore = (test: CalendarDate | null, reference: CalendarDate | null) => {
   if (test && reference) {
-    if (test.month < reference.month) {
+    if (test.year < reference.year) {
       return true;
     }
-    if (test.day <= reference.day && test.month === reference.month) {
+    if (test.month < reference.month && test.year === reference.year) {
+      return true;
+    }
+    if (test.day <= reference.day && test.month === reference.month && test.year === reference.year) {
       return true;
     }
   }

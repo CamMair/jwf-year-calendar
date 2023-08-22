@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-
-
 import Month, { WeekStartType } from './Month';
-import { CalendarDate, isAfter, isBefore } from '../lib/dates';
-    
+import { isAfter, isBefore } from '../lib/dates';
+import { CalendarDate, DataSource, SanitizedDataSource, SanitizedDataSourceItem } from '../lib/types';
+import { isHexColor, isTailwindColor } from '../lib/utils';
+
 const Year = (props: { className?: string; onClick?: (year: number) => unknown; year: number }) => {
   return (
     <button
@@ -41,21 +41,45 @@ const YearEnd = (props: { className?: string; onClick?: (year: number) => unknow
   );
 };
 
-const MyCalendar = (props: { className?: string; weekStart?: WeekStartType; year?: number; enableRangeSelection?: boolean;
-  onRangeSelected?: (e: { startDate: CalendarDate; endDate: CalendarDate }) => void; }) => {
+const MyCalendar = (props: {
+  className?: string;
+  weekStart?: WeekStartType;
+  year?: number;
+  dataSource?: DataSource;
+  enableRangeSelection?: boolean;
+  onRangeSelected?: (e: { startDate: CalendarDate; endDate: CalendarDate }) => void;
+}) => {
   const myCalendarRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [startDate, setStartDate] = useState<{ day: number; month: number; year: number } | null>(null);
   const [endDate, setEndDate] = useState<{ day: number; month: number; year: number } | null>(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [year, setYear] = useState(props.year || new Date().getFullYear());
-  
+
+  let sanitizedDataSource: SanitizedDataSource = [];
+
+  if (props.dataSource) {
+    let defaultColors = ['#2C8FC9', '#9CB703', '#F5BB00', '#FF4A32', '#B56CE2', '#45A597'];
+    sanitizedDataSource = props.dataSource.map(event => {
+      if (event.color === undefined) {
+        const sanitizedEvent = event;
+        [sanitizedEvent.color] = defaultColors;
+        defaultColors = [...defaultColors.slice(1), ...defaultColors.slice(0, 1)];
+        return sanitizedEvent as SanitizedDataSourceItem;
+      }
+      if (!isTailwindColor(event.color) && !isHexColor(event.color)) {
+        throw new Error(`Invalid color prop "${event.color}" provided to Calendar component`);
+      }
+      return event as SanitizedDataSourceItem;
+    });
+  }
+
   const handleSetEndDate = (d: CalendarDate | null) => {
     if (props.enableRangeSelection) {
       setEndDate(d);
     }
   };
-  
+
   const handleSetStartDate = (d: CalendarDate | null) => {
     if (props.enableRangeSelection) {
       setStartDate(d);
@@ -171,9 +195,9 @@ const MyCalendar = (props: { className?: string; weekStart?: WeekStartType; year
         onMouseLeave={() => handleSetStartDate(null)}
       >
         {months.map((month, index) => {
-
           return (
             <Month
+              dataSource={sanitizedDataSource}
               endDate={endDate}
               index={index}
               key={index}
@@ -185,7 +209,6 @@ const MyCalendar = (props: { className?: string; weekStart?: WeekStartType; year
               year={year}
             />
           );
-
         })}
       </div>
       {/* </div> */}
