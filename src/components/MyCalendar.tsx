@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Month, { WeekStartType } from './Month';
-import { isAfter, isBefore } from '../lib/dates';
+import { isAfter, isBefore, relevantEvents } from '../lib/dates';
 import { CalendarDate, DataSource, SanitizedDataSource, SanitizedDataSourceItem } from '../lib/types';
 import { isHexColor, isTailwindColor } from '../lib/utils';
 
@@ -54,6 +54,23 @@ const MyCalendar = (props: {
   const [startDate, setStartDate] = useState<{ day: number; month: number; year: number } | null>(null);
   const [endDate, setEndDate] = useState<{ day: number; month: number; year: number } | null>(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  // const [selectedEvent, setSelectedEvent] = useState<SanitizedDataSourceItem | null>(null);
+
+  const [contextMenu, setContextMenu] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    day: number;
+    month: number;
+    year: number;
+  }>({
+    visible: false,
+    x: 0,
+    y: 0,
+    day: 0,
+    month: 0,
+    year: 0,
+  });
   const [year, setYear] = useState(props.year || new Date().getFullYear());
 
   let sanitizedDataSource: SanitizedDataSource = [];
@@ -119,6 +136,12 @@ const MyCalendar = (props: {
     };
   }, [window.innerWidth]);
 
+  useEffect(() => {
+    window.addEventListener("click", handleContextMenu);
+    return () => {
+      window.removeEventListener("")
+    }
+  });
   const determineGridCols = () => {
     const minWidth = Math.min(windowWidth, containerWidth);
     if (minWidth >= 1100) {
@@ -201,6 +224,7 @@ const MyCalendar = (props: {
               endDate={endDate}
               index={index}
               key={index}
+              setContextMenu={setContextMenu}
               setEndDate={handleSetEndDate}
               setStartDate={handleSetStartDate}
               startDate={startDate}
@@ -211,7 +235,21 @@ const MyCalendar = (props: {
           );
         })}
       </div>
-      {/* </div> */}
+      {contextMenu.visible && (
+        <div
+          className="absolute"
+          onContextMenu={e => e.preventDefault()}
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+        >
+          {relevantEvents({ ...contextMenu }, sanitizedDataSource).map((event, i) => {
+            return (
+              <div className={'w-40 h-9 bg-slate-400'} key={i}>
+                {event.name}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </>
   );
 };
