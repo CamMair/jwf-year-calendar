@@ -4,18 +4,68 @@ import React, { useState } from 'react';
 import Calendar from 'rc-year-calendar';
 import Modal from './assets/Modal';
 import MyCalendar from './components/MyCalendar';
+import { DataSource } from './lib/types';
 
 function App() {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [start, setStart] = useState<Date | null>(null);
   const [end, setEnd] = useState<Date | null>(null);
 
-  const dataSource = [
+  const dataSource: DataSource = [
     {
       id: 1,
-      color: '#ABCDEF',
-      startDate: new Date(2023, 7, 8),
-      endDate: new Date(2023, 9, 9),
+      startDate: {
+        day: 1,
+        month: 10,
+        year: 2023,
+      },
+      endDate: {
+        day: 15,
+        month: 10,
+        year: 2024,
+      },
+      name: 'I am on holiday',
+    },
+    {
+      id: 2,
+      startDate: {
+        day: 11,
+        month: 10,
+        year: 2023,
+      },
+      endDate: {
+        day: 21,
+        month: 10,
+        year: 2023,
+      },
+      name: 'I am on holiday',
+    },
+    {
+      id: 3,
+      startDate: {
+        day: 10,
+        month: 10,
+        year: 2023,
+      },
+      endDate: {
+        day: 15,
+        month: 10,
+        year: 2023,
+      },
+      name: 'I am on holiday',
+    },
+    {
+      id: 4,
+      startDate: {
+        day: 14,
+        month: 10,
+        year: 2023,
+      },
+      endDate: {
+        day: 15,
+        month: 10,
+        year: 2023,
+      },
       name: 'I am on holiday',
     },
   ];
@@ -39,9 +89,14 @@ function App() {
           <div>{end?.toISOString()}</div>
         </Modal>
       )}
-      
-      <MyCalendar enableRangeSelection={true} onRangeSelected={e => console.log(e)} weekStart={0} />
-      
+
+      <MyCalendar
+        dataSource={dataSource}
+        enableRangeSelection={true}
+        onRangeSelected={e => console.log(e)}
+        weekStart={0}
+      />
+
       <Calendar
         contextMenuItems={[
           { text: 'Delete', click: () => console.log(1) },
@@ -49,9 +104,38 @@ function App() {
           { text: 'Delete', click: () => console.log(3) },
           { text: 'Delete', click: () => console.log(4) },
         ]}
-        dataSource={dataSource}
+        dataSource={[
+          {
+            id: 1,
+            color: '#1DFAD8',
+            startDate: new Date(1995, 9, 13),
+            endDate: new Date(1995, 9, 15),
+            name: 'I am on holiday',
+          },
+          {
+            id: 2,
+            color: '#1D4EA1',
+            startDate: new Date(1995, 9, 15),
+            endDate: new Date(1995, 9, 16),
+            name: 'I am on holiday',
+          },
+          {
+            id: 3,
+            color: '#9F4ED8',
+            startDate: new Date(1995, 9, 13),
+            endDate: new Date(1995, 9, 15),
+            name: 'I am on holiday',
+          },
+          {
+            id: 4,
+            color: '#1F8AA8',
+            startDate: new Date(1995, 9, 14),
+            endDate: new Date(1995, 9, 15),
+            name: 'I am on holiday',
+          },
+        ]}
         enableContextMenu={true}
-        enableRangeSelection={false}
+        enableRangeSelection={true}
         onRangeSelected={(e: { startDate: Date; endDate: Date }) => handleRangeSelected(e.startDate, e.endDate)}
         onYearChanged={(e: { currentYear: number }) => console.log(e.currentYear)}
         year={2038}
