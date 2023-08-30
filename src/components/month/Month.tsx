@@ -1,6 +1,7 @@
 import React from 'react';
-import { isAfter, isBefore, isBetweenDates, isEqual, relevantEvents } from '../lib/dates';
-import { CalendarDate, SanitizedDataSource, SanitizedDataSourceItem } from '../lib/types';
+import { isAfter, isBefore, isBetweenDates, isEqual, relevantEvents } from '../../lib/dates';
+import { CalendarDate, SanitizedDataSource, SanitizedDataSourceItem } from '../../lib/types';
+import { isTailwindColor } from '../../lib/utils';
 
 export type WeekStartType = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -47,19 +48,8 @@ const DayNumbered = (props: {
     return 'hover:rounded';
   };
 
-  const isTailwindClass = (color: string) => {
-    if (
-      /^bg-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuscia|pink|rose)-(100|200|300|400|500|600|700|800|900)$/.test(
-        color
-      )
-    ) {
-      return true;
-    }
-    return false;
-  };
-
   const getBookedDiv = (e: SanitizedDataSourceItem, size: 1 | 2) => {
-    if (isTailwindClass(e.color)) {
+    if (isTailwindColor(e.color)) {
       return <div className={`${e.color} ${size === 1 ? 'h-[1px]' : 'h-[2px]'}`}></div>;
     }
     return <div className={`${size === 1 ? 'h-[1px]' : 'h-[2px]'}`} style={{ backgroundColor: e.color }}></div>;
@@ -110,29 +100,6 @@ const DayNumbered = (props: {
         year: props.year,
       });
     }
-    /*
-    const events = relevantEvents();
-    if (events.length > 0) {
-      return (
-        <div>
-          {events.map(event => {
-            return <div className={'w-40 h-9'}></div>;
-          })}
-        </div>
-      );
-      // () => setSelectedEvent(selectedEvent)
-      /*
-      for (let i = 0; i < events.length; i += 1) {
-        setSelectedEvent(selectedEvent && events[i].name);
-        // eslint-disable-next-line no-alert
-        alert(`Event ${events[i].name}`);
-      }
-      return ;
-      */
-    /*
-    }
-    return null;
-    */
   };
 
   return (

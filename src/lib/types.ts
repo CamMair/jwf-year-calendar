@@ -8,6 +8,14 @@ export type DataSourceItem = {
   startDate: CalendarDate;
 };
 
+export type ContextMenuItem = {
+  text: string;
+};
+
+export type SanitizedContextMenuItem = {
+  text: string;
+};
+
 export type SanitizedDataSourceItem = {
   id: number;
   color: string;
@@ -17,5 +25,9 @@ export type SanitizedDataSourceItem = {
 };
 
 export type DataSource = DataSourceItem[];
+
+export type ContextMenu = ContextMenuItem[];
+
+export type SanitizedContextMenu = SanitizedContextMenuItem[];
 
 export type SanitizedDataSource = SanitizedDataSourceItem[];

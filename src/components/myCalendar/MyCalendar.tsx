@@ -1,8 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Month, { WeekStartType } from './Month';
-import { isAfter, isBefore, relevantEvents } from '../lib/dates';
-import { CalendarDate, DataSource, SanitizedDataSource, SanitizedDataSourceItem } from '../lib/types';
-import { isHexColor, isTailwindColor } from '../lib/utils';
+import Month, { WeekStartType } from '../month/Month';
+import { isAfter, isBefore, relevantEvents } from '../../lib/dates';
+import {
+  CalendarDate,
+  ContextMenuItem,
+  SanitizedContextMenu,
+  SanitizedContextMenuItem,
+  DataSource,
+  SanitizedDataSource,
+  SanitizedDataSourceItem,
+} from '../../lib/types';
+import { isHexColor, isTailwindColor } from '../../lib/utils';
 
 const Year = (props: { className?: string; onClick?: (year: number) => unknown; year: number }) => {
   return (
@@ -46,6 +54,7 @@ const MyCalendar = (props: {
   weekStart?: WeekStartType;
   year?: number;
   dataSource?: DataSource;
+  contextMenuItem?: ContextMenuItem;
   enableRangeSelection?: boolean;
   onRangeSelected?: (e: { startDate: CalendarDate; endDate: CalendarDate }) => void;
 }) => {
@@ -55,7 +64,10 @@ const MyCalendar = (props: {
   const [endDate, setEndDate] = useState<{ day: number; month: number; year: number } | null>(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   // const [selectedEvent, setSelectedEvent] = useState<SanitizedDataSourceItem | null>(null);
-
+  const [contextMenuItems, setContextMenuItems] = useState<{ hoverIndex: number; visible: boolean }>({
+    hoverIndex: 0,
+    visible: false,
+  });
   const [contextMenu, setContextMenu] = useState<{
     visible: boolean;
     x: number;
@@ -136,12 +148,29 @@ const MyCalendar = (props: {
     };
   }, [window.innerWidth]);
 
-  useEffect(() => {
-    window.addEventListener("click", handleContextMenu);
-    return () => {
-      window.removeEventListener("")
+  const hideContextMenu = (e: MouseEvent) => {
+    if (e.target instanceof HTMLElement) {
+      if (e.target.id === 'contextmenutile' || e.target.parentElement?.id === 'contextmenutile') {
+        return;
+      }
     }
-  });
+    setContextMenu({ ...contextMenu, visible: false });
+  };
+
+  const handleShowContextMenuItems = (i: number) => {
+    setContextMenuItems({ hoverIndex: i, visible: true });
+  };
+
+  console.log(contextMenuItems);
+
+  useEffect(() => {
+    document.addEventListener('click', hideContextMenu);
+
+    return () => {
+      document.removeEventListener('click', hideContextMenu);
+    };
+  }, [contextMenu]);
+
   const determineGridCols = () => {
     const minWidth = Math.min(windowWidth, containerWidth);
     if (minWidth >= 1100) {
@@ -178,6 +207,13 @@ const MyCalendar = (props: {
       return { startDate: two, endDate: one };
     }
     throw new Error('orderDates method in MyCalendar failed');
+  };
+
+  const getColorDiv = (e: SanitizedDataSourceItem) => {
+    if (isTailwindColor(e.color)) {
+      return <div className={`${e.color} h-9`}></div>;
+    }
+    return <div className={'flex-none h-full w-1 '} style={{ backgroundColor: e.color }}></div>;
   };
 
   return (
@@ -239,12 +275,35 @@ const MyCalendar = (props: {
         <div
           className="absolute"
           onContextMenu={e => e.preventDefault()}
+          onMouseLeave={() => setContextMenuItems({ hoverIndex: 0, visible: false })}
           style={{ top: contextMenu.y, left: contextMenu.x }}
         >
           {relevantEvents({ ...contextMenu }, sanitizedDataSource).map((event, i) => {
             return (
-              <div className={'w-40 h-9 bg-slate-400'} key={i}>
-                {event.name}
+              <div className="flex relative">
+                <div
+                  id="contextmenutile"
+                  className={`border border-gray-200 border-solid bg-white cursor-pointer flex items-center shadow-xl select-none h-9 hover:bg-gray-200 w-full`}
+                  key={i}
+                  onClick={() => console.log('hello')}
+                  onMouseEnter={() => handleShowContextMenuItems(i)}
+                >
+                  {getColorDiv(event)}
+                  <div className={'flex-auto inline pl-2 '}>{event.name}</div>
+                  <div className={'flex-none inline px-2'}>{'›'}</div>
+                </div>
+                {i === contextMenuItems.hoverIndex && contextMenuItems.visible && (
+                  <div className="flex">
+                    <div className={'absolute flex flex-col w-max'}>
+                      <div className="border border-gray-200 border-solid bg-white cursor-pointer flex items-center  shadow-xl select-none h-9 w-full hover:bg-gray-200 px-2 flex-auto inline">
+                        {props.contextMenuItem?.text}
+                      </div>
+                      <div className="border border-gray-200 border-solid bg-white cursor-pointer flex items-center  align-middle shadow-xl select-none h-9 w-full hover:bg-gray-200 px-2 flex-auto inline">
+                        {props.contextMenuItem?.text}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}

@@ -3,13 +3,15 @@
 import React, { useState } from 'react';
 import Calendar from 'rc-year-calendar';
 import Modal from './assets/Modal';
-import MyCalendar from './components/MyCalendar';
-import { DataSource } from './lib/types';
+import MyCalendar from './components/myCalendar/MyCalendar';
+import { ContextMenuItem, DataSource } from './lib/types';
 
 function App() {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [start, setStart] = useState<Date | null>(null);
   const [end, setEnd] = useState<Date | null>(null);
+
+  const contextMenuItem: ContextMenuItem = { text: 'Create' };
 
   const dataSource: DataSource = [
     {
@@ -24,7 +26,7 @@ function App() {
         month: 1,
         year: 2023,
       },
-      name: 'I am on holiday',
+      name: 'Rome',
     },
     {
       id: 2,
@@ -38,7 +40,7 @@ function App() {
         month: 2,
         year: 2023,
       },
-      name: 'I am on holiday',
+      name: 'Berlin',
     },
     {
       id: 3,
@@ -52,7 +54,7 @@ function App() {
         month: 1,
         year: 2023,
       },
-      name: 'I am on holiday',
+      name: 'Paris',
     },
     {
       id: 4,
@@ -66,7 +68,7 @@ function App() {
         month: 1,
         year: 2023,
       },
-      name: 'I am on holiday',
+      name: 'Glasgow',
     },
   ];
 
@@ -92,6 +94,7 @@ function App() {
 
       <MyCalendar
         dataSource={dataSource}
+        contextMenuItem={contextMenuItem}
         enableRangeSelection={true}
         onRangeSelected={e => console.log(e)}
         weekStart={0}
