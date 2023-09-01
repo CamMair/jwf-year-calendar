@@ -1,5 +1,6 @@
 // Copyright 2023 JWF Process Solutions Ltd. - All Rights reserved
 // Author: Cameron Mair
+
 import React, { useState } from 'react';
 import Calendar from 'rc-year-calendar';
 import Modal from './assets/Modal';
@@ -11,7 +12,32 @@ function App() {
   const [start, setStart] = useState<Date | null>(null);
   const [end, setEnd] = useState<Date | null>(null);
 
-  const contextMenuItem: ContextMenuItem = { text: 'Create' };
+  const contextMenuItems: ContextMenuItem[] = [
+    {
+      text: 'Create',
+      onClick: e => {
+        console.log(e);
+      },
+    },
+    {
+      text: 'Return',
+      onClick: e => {
+        console.log(e);
+      },
+    },
+    {
+      text: 'Update',
+      onClick: e => {
+        console.log(e);
+      },
+    },
+    {
+      text: 'Delete',
+      onClick: e => {
+        console.log(e);
+      },
+    },
+  ];
 
   const dataSource: DataSource = [
     {
@@ -70,6 +96,34 @@ function App() {
       },
       name: 'Glasgow',
     },
+    {
+      id: 5,
+      startDate: {
+        day: 26,
+        month: 8,
+        year: 2023,
+      },
+      endDate: {
+        day: 2,
+        month: 9,
+        year: 2023,
+      },
+      name: 'Edinburgh',
+    },
+    {
+      id: 6,
+      startDate: {
+        day: 1,
+        month: 9,
+        year: 2023,
+      },
+      endDate: {
+        day: 8,
+        month: 9,
+        year: 2023,
+      },
+      name: 'Glasgow',
+    },
   ];
 
   const handleRangeSelected = (startDate: Date, endDate: Date) => {
@@ -94,7 +148,7 @@ function App() {
 
       <MyCalendar
         dataSource={dataSource}
-        contextMenuItem={contextMenuItem}
+        contextMenuItems={contextMenuItems}
         enableRangeSelection={true}
         onRangeSelected={e => console.log(e)}
         weekStart={0}

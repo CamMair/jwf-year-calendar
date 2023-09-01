@@ -130,9 +130,7 @@ const DayNumbered = (props: {
 };
 
 const DayOfWeekHeading = (props: { name: string }) => {
-  return (
-    <div className="col-1 cursor-default h-6 inline-block text-sm font-bold select-none text-sm">{props.name}</div>
-  );
+  return <div className="col-1 cursor-default font-bold h-6 inline-block select-none text-sm">{props.name}</div>;
 };
 
 const DayPlaceholder = () => {

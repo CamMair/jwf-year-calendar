@@ -1,27 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Month, { WeekStartType } from '../month/Month';
-import { isAfter, isBefore, relevantEvents } from '../../lib/dates';
+import Year from './Year';
+import { sanitizeDataSource } from './SanitizedDataSource';
+import hideContextMenu from './HideContextMenu';
+import { relevantEvents } from '../../lib/dates';
 import {
   CalendarDate,
   ContextMenuItem,
-  SanitizedContextMenu,
-  SanitizedContextMenuItem,
   DataSource,
   SanitizedDataSource,
   SanitizedDataSourceItem,
 } from '../../lib/types';
-import { isHexColor, isTailwindColor } from '../../lib/utils';
-
-const Year = (props: { className?: string; onClick?: (year: number) => unknown; year: number }) => {
-  return (
-    <button
-      className={`${props.className || ''} bg-white font-bold h-11 text-2xl w-full`}
-      onClick={() => (props.onClick ? props.onClick(props.year) : null)}
-    >
-      {props.year}
-    </button>
-  );
-};
+import { determineGridCols, showYearEnd, showYearMiddle, orderDates, isTailwindColor } from '../../lib/utils';
 
 const YearCentre = (props: { className?: string; onClick?: (year: number) => unknown; year: number }) => {
   return (
@@ -54,7 +44,7 @@ const MyCalendar = (props: {
   weekStart?: WeekStartType;
   year?: number;
   dataSource?: DataSource;
-  contextMenuItem?: ContextMenuItem;
+  contextMenuItems?: ContextMenuItem[];
   enableRangeSelection?: boolean;
   onRangeSelected?: (e: { startDate: CalendarDate; endDate: CalendarDate }) => void;
 }) => {
@@ -63,7 +53,6 @@ const MyCalendar = (props: {
   const [startDate, setStartDate] = useState<{ day: number; month: number; year: number } | null>(null);
   const [endDate, setEndDate] = useState<{ day: number; month: number; year: number } | null>(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  // const [selectedEvent, setSelectedEvent] = useState<SanitizedDataSourceItem | null>(null);
   const [contextMenuItems, setContextMenuItems] = useState<{ hoverIndex: number; visible: boolean }>({
     hoverIndex: 0,
     visible: false,
@@ -86,21 +75,8 @@ const MyCalendar = (props: {
   const [year, setYear] = useState(props.year || new Date().getFullYear());
 
   let sanitizedDataSource: SanitizedDataSource = [];
-
   if (props.dataSource) {
-    let defaultColors = ['#2C8FC9', '#9CB703', '#F5BB00', '#FF4A32', '#B56CE2', '#45A597'];
-    sanitizedDataSource = props.dataSource.map(event => {
-      if (event.color === undefined) {
-        const sanitizedEvent = event;
-        [sanitizedEvent.color] = defaultColors;
-        defaultColors = [...defaultColors.slice(1), ...defaultColors.slice(0, 1)];
-        return sanitizedEvent as SanitizedDataSourceItem;
-      }
-      if (!isTailwindColor(event.color) && !isHexColor(event.color)) {
-        throw new Error(`Invalid color prop "${event.color}" provided to Calendar component`);
-      }
-      return event as SanitizedDataSourceItem;
-    });
+    sanitizedDataSource = sanitizeDataSource(props.dataSource);
   }
 
   const handleSetEndDate = (d: CalendarDate | null) => {
@@ -148,66 +124,29 @@ const MyCalendar = (props: {
     };
   }, [window.innerWidth]);
 
-  const hideContextMenu = (e: MouseEvent) => {
-    if (e.target instanceof HTMLElement) {
-      if (e.target.id === 'contextmenutile' || e.target.parentElement?.id === 'contextmenutile') {
-        return;
-      }
-    }
-    setContextMenu({ ...contextMenu, visible: false });
-  };
-
   const handleShowContextMenuItems = (i: number) => {
     setContextMenuItems({ hoverIndex: i, visible: true });
   };
 
-  console.log(contextMenuItems);
-
   useEffect(() => {
-    document.addEventListener('click', hideContextMenu);
+    const handleHideContextMenu = (e: MouseEvent) => {
+      hideContextMenu(e, contextMenu, setContextMenu);
+    };
+
+    document.addEventListener('click', handleHideContextMenu);
 
     return () => {
-      document.removeEventListener('click', hideContextMenu);
+      document.removeEventListener('click', handleHideContextMenu);
     };
   }, [contextMenu]);
 
-  const determineGridCols = () => {
-    const minWidth = Math.min(windowWidth, containerWidth);
-    if (minWidth >= 1100) {
-      return 'grid-cols-6';
-    }
-    if (minWidth >= 756) {
-      return 'grid-cols-4';
-    }
-    if (minWidth >= 572) {
-      return 'grid-cols-3';
-    }
-    if (minWidth >= 386) {
-      return 'grid-cols-2';
-    }
-    if (minWidth >= 1) {
-      return 'grid-cols-1';
-    }
-    return 'grid-cols-6';
-  };
+  const gridCols = determineGridCols(windowWidth, containerWidth);
 
-  const showYearEnd = () => {
-    return Math.min(windowWidth, containerWidth) > 975;
-  };
+  const yearEndShown = showYearEnd;
 
-  const showYearMiddle = () => {
-    return Math.min(windowWidth, containerWidth) > 750;
-  };
+  const yearMiddleShown = showYearMiddle;
 
-  const orderDates = (one: CalendarDate, two: CalendarDate) => {
-    if (isBefore(one, two)) {
-      return { startDate: one, endDate: two };
-    }
-    if (isAfter(one, two)) {
-      return { startDate: two, endDate: one };
-    }
-    throw new Error('orderDates method in MyCalendar failed');
-  };
+  const checkDates = orderDates;
 
   const getColorDiv = (e: SanitizedDataSourceItem) => {
     if (isTailwindColor(e.color)) {
@@ -218,7 +157,6 @@ const MyCalendar = (props: {
 
   return (
     <>
-      {/* <div className="container max-w-8xl bg-sky-100"> */}
       <div className="border border-1">
         <div className={`flex items-center justify-center`}>
           <button
@@ -227,11 +165,11 @@ const MyCalendar = (props: {
           >
             {'‹'}
           </button>
-          {showYearEnd() && <YearEnd onClick={y => setYear(y)} year={year - 2} />}
-          {showYearMiddle() && <YearMiddle onClick={y => setYear(y)} year={year - 1} />}
+          {yearEndShown(windowWidth, containerWidth) && <YearEnd onClick={y => setYear(y)} year={year - 2} />}
+          {yearMiddleShown(windowWidth, containerWidth) && <YearMiddle onClick={y => setYear(y)} year={year - 1} />}
           <YearCentre onClick={y => setYear(y)} year={year} />
-          {showYearMiddle() && <YearMiddle onClick={y => setYear(y)} year={year + 1} />}
-          {showYearEnd() && <YearEnd onClick={y => setYear(y)} year={year + 2} />}
+          {yearMiddleShown(windowWidth, containerWidth) && <YearMiddle onClick={y => setYear(y)} year={year + 1} />}
+          {yearEndShown(windowWidth, containerWidth) && <YearEnd onClick={y => setYear(y)} year={year + 2} />}
           <button
             className={'bg-white font-bold h-11 hover:bg-gray-200 px-2.5 text-gray-800 text-2xl w-7'}
             onClick={() => setYear(year + 1)}
@@ -241,12 +179,12 @@ const MyCalendar = (props: {
         </div>
       </div>
       <div
-        className={`grid ${determineGridCols()} justify-items-center mt-5 select-none text-center text-sm w-full`}
+        className={`grid ${gridCols} justify-items-center mt-5 select-none text-center text-sm w-full`}
         ref={myCalendarRef}
         onMouseDown={() => handleSetEndDate(null)}
         onMouseUp={() => {
           if (startDate && endDate && props.onRangeSelected) {
-            props.onRangeSelected(orderDates(startDate, endDate));
+            props.onRangeSelected(checkDates(startDate, endDate));
           }
           handleSetStartDate(null);
           return false;
@@ -283,9 +221,8 @@ const MyCalendar = (props: {
               <div className="flex relative">
                 <div
                   id="contextmenutile"
-                  className={`border border-gray-200 border-solid bg-white cursor-pointer flex items-center shadow-xl select-none h-9 hover:bg-gray-200 w-full`}
+                  className={`border border-gray-200 border-solid bg-white cursor-pointer flex items-center h-9 hover:bg-gray-200 shadow-xl select-none w-full`}
                   key={i}
-                  onClick={() => console.log('hello')}
                   onMouseEnter={() => handleShowContextMenuItems(i)}
                 >
                   {getColorDiv(event)}
@@ -295,12 +232,15 @@ const MyCalendar = (props: {
                 {i === contextMenuItems.hoverIndex && contextMenuItems.visible && (
                   <div className="flex">
                     <div className={'absolute flex flex-col w-max'}>
-                      <div className="border border-gray-200 border-solid bg-white cursor-pointer flex items-center  shadow-xl select-none h-9 w-full hover:bg-gray-200 px-2 flex-auto inline">
-                        {props.contextMenuItem?.text}
-                      </div>
-                      <div className="border border-gray-200 border-solid bg-white cursor-pointer flex items-center  align-middle shadow-xl select-none h-9 w-full hover:bg-gray-200 px-2 flex-auto inline">
-                        {props.contextMenuItem?.text}
-                      </div>
+                      {props.contextMenuItems?.map((item, index) => (
+                        <div
+                          key={index}
+                          onClick={() => item.onClick(item)}
+                          className="border border-gray-200 border-solid bg-white cursor-pointer flex-auto inline flex  h-9 hover:bg-gray-200 items-center px-2 shadow-xl select-none w-full"
+                        >
+                          {item.text}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}

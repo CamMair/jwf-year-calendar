@@ -10,6 +10,7 @@ export type DataSourceItem = {
 
 export type ContextMenuItem = {
   text: string;
+  onClick: (e: SanitizedContextMenuItem) => unknown;
 };
 
 export type SanitizedContextMenuItem = {
