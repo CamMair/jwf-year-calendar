@@ -47,6 +47,7 @@ const MyCalendar = (props: {
   year?: number;
   dataSource?: DataSource;
   enableRangeSelection?: boolean;
+  disabledDays?: Array<number>;
   onRangeSelected?: (e: { startDate: CalendarDate; endDate: CalendarDate }) => void;
 }) => {
   const myCalendarRef = useRef<HTMLDivElement | null>(null);
@@ -201,6 +202,7 @@ const MyCalendar = (props: {
               endDate={endDate}
               index={index}
               key={index}
+              disabledDays={props.disabledDays}
               setEndDate={handleSetEndDate}
               setStartDate={handleSetStartDate}
               startDate={startDate}

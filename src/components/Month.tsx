@@ -6,6 +6,7 @@ export type WeekStartType = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 const DayNumbered = (props: {
   dataSource?: SanitizedDataSource;
   day: number;
+  disabled?: boolean;
   endDate: CalendarDate | null;
   month: number;
   setEndDate: (x: CalendarDate | null) => unknown;
@@ -19,6 +20,15 @@ const DayNumbered = (props: {
     year: props.year,
   };
 
+  if (props.disabled) {
+    return (
+      <div
+        className={`flex flex-col h-6 col-1 select-none inline-block justify-items-center pt-1 select-none text-center text-sm text-xs mx-0 text-gray-400`}
+      >
+        {props.day.toString()}
+      </div>
+    );
+  }
   const borderClass = () => {
     if (props.startDate && isEqual(thisDate, props.startDate) && isAfter(props.endDate, props.startDate)) {
       return 'rounded-l';
@@ -137,7 +147,12 @@ const DayNumbered = (props: {
   );
 };
 
-const DayOfWeekHeading = (props: { name: string }) => {
+const DayOfWeekHeading = (props: { name: string; disabled?: boolean }) => {
+  if (props.disabled) {
+    return (
+      <div className="col-1 cursor-default h-6 inline-block text-sm font-bold select-none text-sm">{props.name}</div>
+    );
+  }
   return (
     <div className="col-1 cursor-default h-6 inline-block text-sm font-bold select-none text-sm">{props.name}</div>
   );
@@ -150,6 +165,7 @@ const DayPlaceholder = () => {
 const Month = (props: {
   className?: string;
   dataSource: SanitizedDataSource;
+  disabledDays?: number[];
   endDate: CalendarDate | null;
   index: number;
   setEndDate: (x: CalendarDate | null) => unknown;
@@ -180,10 +196,12 @@ const Month = (props: {
           return <DayPlaceholder key={i} />;
         })}
         {Array.from({ length: daysInMonth }).map((_, i) => {
+          const dayOfWeek = new Date(props.year, props.index, i + 1).getDay();
           return (
             <DayNumbered
               dataSource={props.dataSource}
               day={i + 1}
+              disabled={props.disabledDays?.includes(dayOfWeek)}
               endDate={props.endDate}
               month={props.index + 1}
               key={i}

@@ -92,6 +92,7 @@ function App() {
 
       <MyCalendar
         dataSource={dataSource}
+        // disabledDays={[0, 6]}
         enableRangeSelection={true}
         onRangeSelected={e => console.log(e)}
         weekStart={0}
