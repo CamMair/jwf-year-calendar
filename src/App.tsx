@@ -1,72 +1,128 @@
 // Copyright 2023 JWF Process Solutions Ltd. - All Rights reserved
 // Author: Cameron Mair
+
 import React, { useState } from 'react';
 import Calendar from 'rc-year-calendar';
 import Modal from './assets/Modal';
-import MyCalendar from './components/MyCalendar';
-import { DataSource } from './lib/types';
+import MyCalendar from './components/myCalendar/MyCalendar';
+import { ContextMenuItem, DataSource } from './lib/types';
 
 function App() {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [start, setStart] = useState<Date | null>(null);
   const [end, setEnd] = useState<Date | null>(null);
 
+  const contextMenuItems: ContextMenuItem[] = [
+    {
+      text: 'Create',
+      onClick: e => {
+        console.log(e);
+      },
+    },
+    {
+      text: 'Return',
+      onClick: e => {
+        console.log(e);
+      },
+    },
+    {
+      text: 'Update',
+      onClick: e => {
+        console.log(e);
+      },
+    },
+    {
+      text: 'Delete',
+      onClick: e => {
+        console.log(e);
+      },
+    },
+  ];
+
   const dataSource: DataSource = [
     {
       id: 1,
       startDate: {
         day: 1,
-        month: 10,
+        month: 1,
         year: 2023,
       },
       endDate: {
         day: 15,
-        month: 10,
-        year: 2024,
+        month: 1,
+        year: 2023,
       },
-      name: 'I am on holiday',
+      name: 'Rome',
     },
     {
       id: 2,
       startDate: {
-        day: 11,
-        month: 10,
+        day: 1,
+        month: 1,
         year: 2023,
       },
       endDate: {
         day: 21,
-        month: 10,
+        month: 2,
         year: 2023,
       },
-      name: 'I am on holiday',
+      name: 'Berlin',
     },
     {
       id: 3,
       startDate: {
-        day: 10,
-        month: 10,
+        day: 11,
+        month: 1,
         year: 2023,
       },
       endDate: {
-        day: 15,
-        month: 10,
+        day: 21,
+        month: 1,
         year: 2023,
       },
-      name: 'I am on holiday',
+      name: 'Paris',
     },
     {
       id: 4,
       startDate: {
-        day: 14,
-        month: 10,
+        day: 11,
+        month: 1,
         year: 2023,
       },
       endDate: {
-        day: 15,
-        month: 10,
+        day: 25,
+        month: 1,
         year: 2023,
       },
-      name: 'I am on holiday',
+      name: 'Glasgow',
+    },
+    {
+      id: 5,
+      startDate: {
+        day: 26,
+        month: 8,
+        year: 2023,
+      },
+      endDate: {
+        day: 2,
+        month: 9,
+        year: 2023,
+      },
+      name: 'Edinburgh',
+    },
+    {
+      id: 6,
+      startDate: {
+        day: 1,
+        month: 9,
+        year: 2023,
+      },
+      endDate: {
+        day: 8,
+        month: 9,
+        year: 2023,
+      },
+      name: 'Glasgow',
     },
   ];
 
@@ -92,6 +148,7 @@ function App() {
 
       <MyCalendar
         dataSource={dataSource}
+        contextMenuItems={contextMenuItems}
         enableRangeSelection={true}
         onRangeSelected={e => console.log(e)}
         weekStart={0}
@@ -99,46 +156,46 @@ function App() {
 
       <Calendar
         contextMenuItems={[
-          { text: 'Delete', click: () => console.log(1) },
-          { text: 'Delete', click: () => console.log(2) },
-          { text: 'Delete', click: () => console.log(3) },
+          { text: 'Create', click: () => console.log(1) },
+          { text: 'Read', click: () => console.log(2) },
+          { text: 'Update', click: () => console.log(3) },
           { text: 'Delete', click: () => console.log(4) },
         ]}
         dataSource={[
           {
             id: 1,
             color: '#1DFAD8',
-            startDate: new Date(1995, 9, 13),
-            endDate: new Date(1995, 9, 15),
-            name: 'I am on holiday',
+            startDate: new Date(2023, 9, 13),
+            endDate: new Date(2023, 9, 15),
+            name: 'Crete',
           },
           {
             id: 2,
             color: '#1D4EA1',
-            startDate: new Date(1995, 9, 15),
-            endDate: new Date(1995, 9, 16),
-            name: 'I am on holiday',
+            startDate: new Date(2023, 9, 15),
+            endDate: new Date(2023, 9, 16),
+            name: 'Greece',
           },
           {
             id: 3,
             color: '#9F4ED8',
-            startDate: new Date(1995, 9, 13),
-            endDate: new Date(1995, 9, 15),
-            name: 'I am on holiday',
+            startDate: new Date(2023, 9, 13),
+            endDate: new Date(2023, 9, 15),
+            name: 'Spain',
           },
           {
             id: 4,
             color: '#1F8AA8',
-            startDate: new Date(1995, 9, 14),
-            endDate: new Date(1995, 9, 15),
-            name: 'I am on holiday',
+            startDate: new Date(2023, 9, 14),
+            endDate: new Date(2023, 9, 15),
+            name: 'Portugal',
           },
         ]}
         enableContextMenu={true}
         enableRangeSelection={true}
         onRangeSelected={(e: { startDate: Date; endDate: Date }) => handleRangeSelected(e.startDate, e.endDate)}
         onYearChanged={(e: { currentYear: number }) => console.log(e.currentYear)}
-        year={2038}
+        year={2023}
       />
     </React.StrictMode>
   );
