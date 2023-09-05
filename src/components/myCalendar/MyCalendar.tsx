@@ -45,6 +45,7 @@ const MyCalendar = (props: {
   year?: number;
   dataSource?: DataSource;
   contextMenuItems?: ContextMenuItem[];
+  disabledWeekDays?: Array<number>;
   enableRangeSelection?: boolean;
   onRangeSelected?: (e: { startDate: CalendarDate; endDate: CalendarDate }) => void;
 }) => {
@@ -195,6 +196,7 @@ const MyCalendar = (props: {
           return (
             <Month
               dataSource={sanitizedDataSource}
+              disabledWeekDays={props.disabledWeekDays}
               endDate={endDate}
               index={index}
               key={index}
