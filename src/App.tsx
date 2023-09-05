@@ -148,6 +148,7 @@ function App() {
 
       <MyCalendar
         dataSource={dataSource}
+        // disabledWeekDays={[0, 6]}
         contextMenuItems={contextMenuItems}
         enableRangeSelection={true}
         onRangeSelected={e => console.log(e)}
@@ -161,6 +162,8 @@ function App() {
           { text: 'Update', click: () => console.log(3) },
           { text: 'Delete', click: () => console.log(4) },
         ]}
+        disabledDays={[new Date()]}
+        disabledWeekDays={[0]}
         dataSource={[
           {
             id: 1,
