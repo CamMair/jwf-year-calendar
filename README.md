@@ -2,7 +2,7 @@
 
 A full react version of Paul-DS' js-year-calendar, https://github.com/year-calendar/js-year-calendar. Built with support from JWF Process Solutions Ltd.
 
-![](calendar.png)
+![](/calendar.png)
 
 ## Installation
 - From the Node package manager, using the following command: `npm install jwf-year-calendar` or `npm i jwf-year-calendar`
