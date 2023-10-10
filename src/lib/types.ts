@@ -1,7 +1,7 @@
 export type CalendarDate = { day: number; month: number; year: number };
 
 export type DataSourceItem = {
-  id: number;
+  id: string;
   color?: string;
   endDate: CalendarDate;
   name: string;
@@ -10,15 +10,11 @@ export type DataSourceItem = {
 
 export type ContextMenuItem = {
   text: string;
-  onClick: (e: SanitizedContextMenuItem) => unknown;
-};
-
-export type SanitizedContextMenuItem = {
-  text: string;
+  onClick: (e: DataSourceItem) => unknown;
 };
 
 export type SanitizedDataSourceItem = {
-  id: number;
+  id: string;
   color: string;
   endDate: CalendarDate;
   name: string;
@@ -28,7 +24,5 @@ export type SanitizedDataSourceItem = {
 export type DataSource = DataSourceItem[];
 
 export type ContextMenu = ContextMenuItem[];
-
-export type SanitizedContextMenu = SanitizedContextMenuItem[];
 
 export type SanitizedDataSource = SanitizedDataSourceItem[];

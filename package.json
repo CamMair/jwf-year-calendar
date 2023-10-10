@@ -1,16 +1,19 @@
 {
-  "name": "vite-test",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "name": "jwf-year-calendar",
+  "author": "Cameron Mair",
+  "main": "dist/index.js",
+  "bin": "dist/index.js",
+  "version": "1.2.3",
+  "license": "Apache-2.0",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "dev": "tsc --noEmit && vite --mode dev"
+    "dev": "tsc --noEmit && vite --mode dev",
+    "build": "rm -rf dist && tsc && npx tailwindcss -i ./src/index.css -o ./dist/index.css && tsc && node addExtensions.js"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^2.2.0",
     "autoprefixer": "^10.4.15",
     "prop-types": "^15.8.1",
-    "rc-year-calendar": "^1.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tailwindcss": "^3.2.7",
@@ -30,6 +33,22 @@
     "eslint-plugin-prettier": "^4.2.1",
     "postcss": "^8.4.21",
     "prettier": "^2.8.0",
+    "replace-in-file": "^7.0.1",
     "typescript": "^4.9.3"
-  }
+  },
+  "keywords": [
+    "jwf-year-calendar",
+    "calendar",
+    "year-calendar",
+    "calendar-year",
+    "jwf-calendar",
+    "javascript-calendar",
+    "typescript-calendar",
+    "ts-calendar",
+    "js-calendar",
+    "typescript",
+    "javascript",
+    "ts",
+    "js"
+  ]
 }

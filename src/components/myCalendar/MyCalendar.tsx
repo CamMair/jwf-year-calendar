@@ -14,15 +14,13 @@ import {
 import { determineGridCols, showYearEnd, showYearMiddle, orderDates, isTailwindColor } from '../../lib/utils';
 
 const YearCentre = (props: { className?: string; onClick?: (year: number) => unknown; year: number }) => {
-  return (
-    <Year className={`${props.className} hover:bg-gray-200 text-gray-800`} onClick={props.onClick} year={props.year} />
-  );
+  return <Year className={`${props.className} hover:bg-gray-200 `} onClick={props.onClick} year={props.year} />;
 };
 
 const YearMiddle = (props: { className?: string; onClick?: (year: number) => unknown; year: number }) => {
   return (
     <Year
-      className={`${props.className} hover:bg-gray-100 text-gray-800/50`}
+      className={`${props.className} hover:bg-gray-200 hover:opacity-50 opacity-50`}
       onClick={props.onClick}
       year={props.year}
     />
@@ -32,7 +30,7 @@ const YearMiddle = (props: { className?: string; onClick?: (year: number) => unk
 const YearEnd = (props: { className?: string; onClick?: (year: number) => unknown; year: number }) => {
   return (
     <Year
-      className={`${props.className} hover:bg-gray-50 text-gray-800/25`}
+      className={`${props.className} hover:bg-gray-200 hover:opacity-25 opacity-25`}
       onClick={props.onClick}
       year={props.year}
     />
@@ -41,6 +39,7 @@ const YearEnd = (props: { className?: string; onClick?: (year: number) => unknow
 
 const MyCalendar = (props: {
   className?: string;
+  darkMode?: boolean;
   weekStart?: WeekStartType;
   year?: number;
   dataSource?: DataSource;
@@ -48,6 +47,7 @@ const MyCalendar = (props: {
   disabledWeekDays?: Array<number>;
   enableRangeSelection?: boolean;
   onRangeSelected?: (e: { startDate: CalendarDate; endDate: CalendarDate }) => void;
+  onYearChanged?: (y: { currentYear: number }) => unknown;
 }) => {
   const myCalendarRef = useRef<HTMLDivElement | null>(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -73,7 +73,7 @@ const MyCalendar = (props: {
     month: 0,
     year: 0,
   });
-  const [year, setYear] = useState(props.year || new Date().getFullYear());
+  const [internalYear, setInternalYear] = useState(props.year || new Date().getFullYear());
 
   let sanitizedDataSource: SanitizedDataSource = [];
   if (props.dataSource) {
@@ -89,6 +89,13 @@ const MyCalendar = (props: {
   const handleSetStartDate = (d: CalendarDate | null) => {
     if (props.enableRangeSelection) {
       setStartDate(d);
+    }
+  };
+
+  const handleSetYear = (y: number) => {
+    setInternalYear(y);
+    if (props.onYearChanged) {
+      props.onYearChanged({ currentYear: y });
     }
   };
 
@@ -143,12 +150,6 @@ const MyCalendar = (props: {
 
   const gridCols = determineGridCols(windowWidth, containerWidth);
 
-  const yearEndShown = showYearEnd;
-
-  const yearMiddleShown = showYearMiddle;
-
-  const checkDates = orderDates;
-
   const getColorDiv = (e: SanitizedDataSourceItem) => {
     if (isTailwindColor(e.color)) {
       return <div className={`${e.color} h-9`}></div>;
@@ -156,24 +157,30 @@ const MyCalendar = (props: {
     return <div className={'flex-none h-full w-1 '} style={{ backgroundColor: e.color }}></div>;
   };
 
+  const year = props.year || internalYear;
+
   return (
     <>
       <div className="border border-1">
         <div className={`flex items-center justify-center`}>
           <button
-            className={'bg-white font-bold h-11 hover:bg-gray-200 px-2.5 text-gray-800 text-2xl w-7'}
-            onClick={() => setYear(year - 1)}
+            className={'font-bold h-11 hover:bg-gray-200 px-2.5 text-2xl w-7'}
+            onClick={() => handleSetYear(props.year ? props.year - 1 : year - 1)}
           >
             {'‹'}
           </button>
-          {yearEndShown(windowWidth, containerWidth) && <YearEnd onClick={y => setYear(y)} year={year - 2} />}
-          {yearMiddleShown(windowWidth, containerWidth) && <YearMiddle onClick={y => setYear(y)} year={year - 1} />}
-          <YearCentre onClick={y => setYear(y)} year={year} />
-          {yearMiddleShown(windowWidth, containerWidth) && <YearMiddle onClick={y => setYear(y)} year={year + 1} />}
-          {yearEndShown(windowWidth, containerWidth) && <YearEnd onClick={y => setYear(y)} year={year + 2} />}
+          {showYearEnd(windowWidth, containerWidth) && <YearEnd onClick={y => handleSetYear(y)} year={year - 2} />}
+          {showYearMiddle(windowWidth, containerWidth) && (
+            <YearMiddle onClick={y => handleSetYear(y)} year={year - 1} />
+          )}
+          <YearCentre onClick={y => handleSetYear(y)} year={year} />
+          {showYearMiddle(windowWidth, containerWidth) && (
+            <YearMiddle onClick={y => handleSetYear(y)} year={year + 1} />
+          )}
+          {showYearEnd(windowWidth, containerWidth) && <YearEnd onClick={y => handleSetYear(y)} year={year + 2} />}
           <button
-            className={'bg-white font-bold h-11 hover:bg-gray-200 px-2.5 text-gray-800 text-2xl w-7'}
-            onClick={() => setYear(year + 1)}
+            className={'font-bold h-11 hover:bg-gray-200 px-2.5 text-2xl w-7'}
+            onClick={() => handleSetYear(year + 1)}
           >
             {'›'}
           </button>
@@ -183,9 +190,9 @@ const MyCalendar = (props: {
         className={`grid ${gridCols} justify-items-center mt-5 select-none text-center text-sm w-full`}
         ref={myCalendarRef}
         onMouseDown={() => handleSetEndDate(null)}
-        onMouseUp={() => {
-          if (startDate && endDate && props.onRangeSelected) {
-            props.onRangeSelected(checkDates(startDate, endDate));
+        onMouseUp={e => {
+          if (startDate && e.button === 0 && props.onRangeSelected) {
+            props.onRangeSelected(orderDates(startDate, endDate || startDate));
           }
           handleSetStartDate(null);
           return false;
@@ -195,6 +202,7 @@ const MyCalendar = (props: {
         {months.map((month, index) => {
           return (
             <Month
+              darkMode={props.darkMode}
               dataSource={sanitizedDataSource}
               disabledWeekDays={props.disabledWeekDays}
               endDate={endDate}
@@ -220,11 +228,14 @@ const MyCalendar = (props: {
         >
           {relevantEvents({ ...contextMenu }, sanitizedDataSource).map((event, i) => {
             return (
-              <div className="flex relative">
+              <div className="flex relative" key={i}>
                 <div
                   id="contextmenutile"
-                  className={`border border-gray-200 border-solid bg-white cursor-pointer flex items-center h-9 hover:bg-gray-200 shadow-xl select-none w-full`}
-                  key={i}
+                  className={`border border-gray-200 border-solid cursor-pointer flex items-center ${
+                    props.darkMode
+                      ? 'bg-gray-800 hover:bg-gray-600 text-white'
+                      : 'bg-white hover:bg-gray-200 text-black'
+                  } h-9 shadow-xl select-none w-full`}
                   onMouseEnter={() => handleShowContextMenuItems(i)}
                 >
                   {getColorDiv(event)}
@@ -237,8 +248,12 @@ const MyCalendar = (props: {
                       {props.contextMenuItems?.map((item, index) => (
                         <div
                           key={index}
-                          onClick={() => item.onClick(item)}
-                          className="border border-gray-200 border-solid bg-white cursor-pointer flex-auto inline flex  h-9 hover:bg-gray-200 items-center px-2 shadow-xl select-none w-full"
+                          onClick={() => item.onClick(event)}
+                          className={`border border-gray-200 border-solid cursor-pointer ${
+                            props.darkMode
+                              ? 'bg-slate-800 hover:bg-slate-600 text-white'
+                              : 'bg-white hover:bg-slate-200 text-black'
+                          } flex-auto flex  h-9 hover: items-center px-2 shadow-xl select-none w-full`}
                         >
                           {item.text}
                         </div>

@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "declaration": true,
+    "incremental": false,
     "target": "ESNext",
     "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
@@ -11,12 +13,12 @@
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
     "moduleResolution": "Node",
+    "outDir": "./dist",
     "resolveJsonModule": true,
+    "rootDir": "./src",
     "isolatedModules": true,
-    "noEmit": true,
     "jsx": "react-jsx"
   },
   "include": ["src"],
   "exclude": [".env.*"],
-  "references": [{ "path": "./tsconfig.node.json" }]
 }
