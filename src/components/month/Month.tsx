@@ -7,6 +7,7 @@ export type WeekStartType = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 const DayNumbered = (props: {
   dataSource?: SanitizedDataSource;
+  darkMode?: boolean;
   day: number;
   disabled?: boolean;
   endDate: CalendarDate | null;
@@ -106,32 +107,28 @@ const DayNumbered = (props: {
   return (
     <>
       {props.disabled && (
-        <div
-          className={`flex flex-col h-6 col-1 select-none inline-block justify-items-center pt-1 select-none text-center text-sm text-xs mx-0 text-gray-400`}
-        >
+        <div className={`flex flex-col h-6 col-1 select-none justify-items-center pt-1 text-center text-xs mx-0`}>
           {props.day.toString()}
         </div>
       )}
       {!props.disabled && (
         <div
-          className={`flex flex-col h-6 col-1 hover:bg-gray-300 ${
+          className={`flex flex-col h-6 col-1 ${props.darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'} ${
             isBetweenDates(thisDate, props.startDate, props.endDate) ? 'bg-gray-300' : ''
-          } ${borderClass()}  cursor-pointer inline-block justify-items-center pt-1 select-none text-center text-sm text-xs mx-0`}
+          } ${borderClass()}  cursor-pointer inline-block justify-items-center pt-1 select-none text-center text-xs mx-0`}
           onContextMenu={e => {
             e.preventDefault();
             handleOnContext(e);
           }}
+          onMouseDown={() => {
+            props.setStartDate({ day: props.day, month: props.month, year: props.year });
+            props.setEndDate({ day: props.day, month: props.month, year: props.year });
+          }}
+          onMouseEnter={() => {
+            props.setEndDate({ day: props.day, month: props.month, year: props.year });
+          }}
         >
-          <div
-            className="flex-grow"
-            onMouseDown={() =>
-              props.setStartDate({ day: props.day, month: props.month, year: props.year }) &&
-              props.setEndDate({ day: props.day, month: props.month, year: props.year })
-            }
-            onMouseEnter={() => props.setEndDate({ day: props.day, month: props.month, year: props.year })}
-          >
-            {props.day.toString()}
-          </div>
+          <div className="flex-grow">{props.day.toString()}</div>
           {eventDivs()}
         </div>
       )}
@@ -140,9 +137,7 @@ const DayNumbered = (props: {
 };
 
 const DayOfWeekHeading = (props: { name: string; disabled?: boolean }) => {
-  return (
-    <div className="col-1 cursor-default h-6 inline-block text-sm font-bold select-none text-sm">{props.name}</div>
-  );
+  return <div className="col-1 cursor-default h-6 inline-block font-bold select-none text-sm">{props.name}</div>;
 };
 
 const DayPlaceholder = () => {
@@ -151,6 +146,7 @@ const DayPlaceholder = () => {
 
 const Month = (props: {
   className?: string;
+  darkMode?: boolean;
   dataSource: SanitizedDataSource;
   disabledWeekDays?: number[];
   endDate: CalendarDate | null;
@@ -177,8 +173,7 @@ const Month = (props: {
   }
   const startDayOfMonth = new Date(props.year, props.index, 1).getDay();
 
-  const monthClasses =
-    'bg-white-500 h-50 inline-block items-center justify-items-center mx-11 text-black text-center w-44';
+  const monthClasses = ' h-50 inline-block items-center justify-items-center mx-11 text-center w-44';
 
   return (
     <div className={`${props.className} ${monthClasses}`}>
@@ -194,6 +189,7 @@ const Month = (props: {
           const dayOfWeek = new Date(props.year, props.index, i + 1).getDay();
           return (
             <DayNumbered
+              darkMode={props.darkMode}
               dataSource={props.dataSource}
               day={i + 1}
               disabled={props.disabledWeekDays?.includes(dayOfWeek)}
@@ -208,7 +204,6 @@ const Month = (props: {
             />
           );
         })}
-        <div className=""></div>
       </div>
     </div>
   );
