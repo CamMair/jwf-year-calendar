@@ -104,6 +104,10 @@ const DayNumbered = (props: {
     }
   };
 
+  const betweenDatesColor = () => {
+    return props.darkMode ? 'bg-gray-600' : 'bg-gray-300';
+  };
+
   return (
     <>
       {props.disabled && (
@@ -114,7 +118,7 @@ const DayNumbered = (props: {
       {!props.disabled && (
         <div
           className={`flex flex-col h-6 col-1 ${props.darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'} ${
-            isBetweenDates(thisDate, props.startDate, props.endDate) ? 'bg-gray-300' : ''
+            isBetweenDates(thisDate, props.startDate, props.endDate) ? betweenDatesColor() : ''
           } ${borderClass()}  cursor-pointer inline-block justify-items-center pt-1 select-none text-center text-xs mx-0`}
           onContextMenu={e => {
             e.preventDefault();
